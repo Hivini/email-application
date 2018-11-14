@@ -20,7 +20,7 @@ public class UserData {
      */
     public String getUserDirectory() {
         // Returns db + the email username
-        return "./db/" + user.getEmail().split("\\@")[0];
+        return "./db/" + user.getEmail().split("@")[0];
     }
 
     public String getMailFilePath() {
@@ -31,9 +31,12 @@ public class UserData {
         return getUserDirectory() + "/users.csv";
     }
 
-    public void setUser(String firstName, String lastName, String email) {
+    public void setUserName(String firstName, String lastName) {
         user.setFirstName(firstName);
         user.setLastName(lastName);
+    }
+
+    public void setUserEmail(String email) {
         user.setEmail(email);
     }
 }

@@ -10,6 +10,11 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.InputStream;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The class that manipulates the data, saves the file and load the file.
@@ -100,9 +105,7 @@ public class MailDataHandler {
             }
 
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (XMLStreamException e) {
+        } catch (FileNotFoundException | XMLStreamException e) {
             e.printStackTrace();
         }
     }
@@ -201,5 +204,42 @@ public class MailDataHandler {
 
     public ObservableList<Mail> getMails() {
         return mails;
+    }
+
+    public static boolean validateEmail(String email) {
+        // Pattern to validate email
+        Pattern pattern = Pattern
+                .compile("^[_A-Za-z0-9-+]+(\\.[_A-Za-z0-9-]+)*@"
+                        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        Matcher matcher = pattern.matcher(email);
+        return matcher.matches();
+    }
+
+    public static String getSHA(String input) {
+        try {
+            // Static getInstance method is called with hashing SHA
+            MessageDigest md = MessageDigest.getInstance("SHA-256");
+
+            byte[] messageDigest = md.digest(input.getBytes());
+
+            // Convert byte array into signum representation
+            BigInteger array= new BigInteger(1, messageDigest);
+
+            // Convert message digest into hex value
+            StringBuilder hashtext = new StringBuilder(array.toString(16));
+
+            while (hashtext.length() < 32) {
+                hashtext.insert(0, "0");
+            }
+            return hashtext.toString();
+        }
+
+        // For specifying wrong message digest algorithms
+        catch (NoSuchAlgorithmException e) {
+            System.out.println("Exception thrown"
+                    + " for incorrect algorithm: " + e);
+
+            return null;
+        }
     }
 }
