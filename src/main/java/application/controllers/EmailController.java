@@ -10,8 +10,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.util.Callback;
-
 import java.io.IOException;
 import java.util.Optional;
 
@@ -68,7 +66,7 @@ public class EmailController {
         emailList.getSelectionModel().selectFirst();
 
         // Setting every cell property to show a menu
-        emailList.setCellFactory((Callback<ListView<Mail>, ListCell<Mail>>) param -> {
+        emailList.setCellFactory(param -> {
             ListCell<Mail> cell = new ListCell<Mail>() {
 
                 @Override

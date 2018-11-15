@@ -15,9 +15,9 @@
         <JFXListView fx:id="emailList" BorderPane.alignment="CENTER" />
     </left>
    <top>
-      <JFXToolbar BorderPane.alignment="CENTER">
+      <JFXToolbar BorderPane.alignment="TOP_LEFT">
          <left>
-            <JFXButton onAction="#showNewEmailDialog" text="New Email" BorderPane.alignment="CENTER" />
+            <JFXButton onAction="#showNewEmailDialog" text="New Email" />
          </left>
       </JFXToolbar>
    </top>
