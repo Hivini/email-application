@@ -2,6 +2,8 @@ package application.dataModels;
 
 import javafx.beans.property.SimpleStringProperty;
 
+import java.time.LocalDate;
+
 /**
  * @author Jorge Vinicio Quintero Santos
  * @className Mail
@@ -14,16 +16,23 @@ public class Mail {
     private SimpleStringProperty body= new SimpleStringProperty("");
     private SimpleStringProperty sendBy = new SimpleStringProperty("");
     private SimpleStringProperty sendTo = new SimpleStringProperty("");
+    private LocalDate sendDate;
 
     public Mail() {
         // This is for the MailDataHandler
     }
 
-    public Mail(String subject, String body, String sendBy, String sendTo) {
+    public Mail(String subject, String body, String sendBy, String sendTo, LocalDate sendDate) {
         this.subject.set(subject);
         this.body.set(body);
         this.sendBy.set(sendBy);
         this.sendTo.set(sendTo);
+        this.sendDate = sendDate;
+    }
+
+    @Override
+    public String toString() {
+        return this.getSubject();
     }
 
     /* Getters and setters */
@@ -74,5 +83,13 @@ public class Mail {
 
     public void setSendTo(String sendTo) {
         this.sendTo.set(sendTo);
+    }
+
+    public LocalDate getSendDate() {
+        return sendDate;
+    }
+
+    public void setSendDate(LocalDate sendDate) {
+        this.sendDate = sendDate;
     }
 }

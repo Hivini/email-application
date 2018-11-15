@@ -39,4 +39,8 @@ public class UserData {
     public void setUserEmail(String email) {
         user.setEmail(email);
     }
+
+    public User getUser() {
+        return user;
+    }
 }

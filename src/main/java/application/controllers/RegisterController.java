@@ -25,6 +25,8 @@ import java.io.*;
 public class RegisterController {
 
     @FXML
+    private Button backButton;
+    @FXML
     private Button registerButton;
     @FXML
     private JFXTextField firstNameField;
@@ -59,8 +61,9 @@ public class RegisterController {
                     // Make the directories for the files
                     if (file.mkdirs()) {
                         try {
-                            MailDataHandler mailDataHandler = new MailDataHandler(UserData.getInstance().getMailFilePath());
-                            mailDataHandler.saveMails();
+                            MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
+                            MailDataHandler.getInstance().saveMails();
+
                             PrintWriter userDataWriter = new PrintWriter(UserData.getInstance().
                                     getUserDataPath(), "UTF-8");
                             // Making the string that would be written as data
@@ -76,6 +79,7 @@ public class RegisterController {
 
                             changeToLoginScene(currentStage);
                         } catch (IOException e1) {
+                            errorLabel.setText("Error getting the file");
                             e1.printStackTrace();
                         }
                     }
@@ -86,6 +90,13 @@ public class RegisterController {
                 errorLabel.setText("The email has not a valid format");
             }
 
+        } else if (e.getSource() == backButton) {
+            try {
+                changeToLoginScene(currentStage);
+            } catch (IOException e1) {
+                errorLabel.setText("Error getting the login file");
+                e1.printStackTrace();
+            }
         } else {
             errorLabel.setText("Complete the form please");
         }

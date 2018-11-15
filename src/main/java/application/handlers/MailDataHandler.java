@@ -13,6 +13,8 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,18 +23,29 @@ import java.util.regex.Pattern;
  */
 public class MailDataHandler {
 
+    private static final MailDataHandler ourInstance = new MailDataHandler();
+
     private static final String MAIL = "mail";
     private static final String SUBJECT = "subject";
     private static final String BODY = "body";
     private static final String SEND_FROM = "sendBy";
     private static final String SEND_TO = "sendTo";
+    private static final String SEND_DATE = "sendDate";
 
     private String fileName;
     private ObservableList<Mail> mails;
+    private DateTimeFormatter formatter;
 
-    public MailDataHandler(String fileName) {
+    private MailDataHandler() {
+        formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+    }
+
+    public void setEmailData(String fileName) {
         this.fileName = fileName;
-        this.mails = FXCollections.observableArrayList();
+    }
+
+    public static MailDataHandler getInstance() {
+        return ourInstance;
     }
 
     public void addMail(Mail item) {
@@ -48,6 +61,7 @@ public class MailDataHandler {
      * Observable Lis mails.
      */
     public void loadMails() {
+        mails = FXCollections.observableArrayList();
         try {
             // First we create an XMLInputFactory for process
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -93,6 +107,13 @@ public class MailDataHandler {
                         mail.setSendTo(event.asCharacters().getData());
                         continue;
                     }
+
+                    if (event.asStartElement().getName().getLocalPart().equals(SEND_DATE)) {
+                        event = eventReader.nextEvent();
+                        LocalDate date = LocalDate.parse(event.asCharacters().getData(), formatter);
+                        mail.setSendDate(date);
+                        continue;
+                    }
                 }
 
                 // If we reach the end of a mail element, we add it to the observable list
@@ -104,10 +125,12 @@ public class MailDataHandler {
                 }
             }
 
-
+            eventReader.close();
         } catch (FileNotFoundException | XMLStreamException e) {
             e.printStackTrace();
         }
+
+
     }
 
     /**
@@ -172,6 +195,7 @@ public class MailDataHandler {
         createNode(eventWriter, BODY, mail.getBody());
         createNode(eventWriter, SEND_FROM, mail.getSendBy());
         createNode(eventWriter, SEND_TO, mail.getSendTo());
+        createNode(eventWriter, SEND_DATE, mail.getSendDate().format(formatter));
 
         eventWriter.add(eventFactory.createEndElement("", "", MAIL));
         eventWriter.add(end);
@@ -223,7 +247,7 @@ public class MailDataHandler {
             byte[] messageDigest = md.digest(input.getBytes());
 
             // Convert byte array into signum representation
-            BigInteger array= new BigInteger(1, messageDigest);
+            BigInteger array = new BigInteger(1, messageDigest);
 
             // Convert message digest into hex value
             StringBuilder hashtext = new StringBuilder(array.toString(16));

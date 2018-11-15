@@ -17,7 +17,6 @@
                 <JFXPasswordField fx:id="passwordField" layoutX="519.0" layoutY="338.0" prefHeight="27.0" prefWidth="242.0" />
                 <JFXTextField fx:id="emailField" layoutX="519.0" layoutY="243.0" prefHeight="27.0" prefWidth="242.0" />
                 <JFXButton fx:id="registerButton" defaultButton="true" layoutX="614.0" layoutY="406.0" onAction="#handleButtonPressed" ripplerFill="#405aa8" text="Register" />
-                <JFXButton layoutX="1134.0" layoutY="64.0" text="Register" textFill="WHITE" />
             <Label layoutX="452.0" layoutY="139.0" text="First Name" />
             <JFXTextField id="firstNameField" fx:id="firstNameField" layoutX="539.0" layoutY="134.0" />
             <JFXTextField id="lastNameField" fx:id="lastNameField" layoutX="539.0" layoutY="180.0" />
@@ -27,6 +26,7 @@
                   <Font name="System Bold" size="13.0" />
                </font>
             </Label>
+            <JFXButton fx:id="backButton" layoutX="102.0" layoutY="77.0" onAction="#handleButtonPressed" text="Back" />
             </children>
         </AnchorPane>
     </center>
