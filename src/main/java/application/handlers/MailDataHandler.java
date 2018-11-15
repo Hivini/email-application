@@ -37,7 +37,7 @@ public class MailDataHandler {
     private DateTimeFormatter formatter;
 
     private MailDataHandler() {
-        formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy");
+        formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
     }
 
     public void setEmailData(String fileName) {
