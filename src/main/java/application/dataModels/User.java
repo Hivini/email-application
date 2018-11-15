@@ -6,7 +6,7 @@ import javafx.beans.property.SimpleStringProperty;
  * @author Jorge Vinicio Quintero Santos
  * @className User
  * @date Nov/12/2018
- * @comments None
+ * @comments This class will be for future releases
  */
 public class User {
 

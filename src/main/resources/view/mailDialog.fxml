@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.scene.control.DialogPane?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+
+<DialogPane prefHeight="450.0" prefWidth="800.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.MailDialogController">
+    <headerText>
+        Fill the information of the new Mail
+    </headerText>
+   <content>
+      <AnchorPane>
+         <children>
+            <Label layoutX="130.0" layoutY="55.0" text="To:" />
+            <JFXTextField fx:id="toField" layoutX="158.0" layoutY="42.0" prefHeight="27.0" prefWidth="285.0" />
+            <JFXTextField fx:id="subjectField" layoutX="123.0" layoutY="116.0" prefHeight="27.0" prefWidth="394.0" />
+            <JFXTextArea fx:id="messageArea" layoutX="123.0" layoutY="186.0" />
+            <Label layoutX="125.0" layoutY="99.0" text="Subject:" />
+            <Label layoutX="123.0" layoutY="169.0" text="Message" />
+         </children></AnchorPane>
+   </content>
+</DialogPane>
