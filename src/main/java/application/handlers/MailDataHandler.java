@@ -13,8 +13,9 @@ import java.io.InputStream;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.FormatStyle;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -31,18 +32,23 @@ public class MailDataHandler {
     private static final String SEND_FROM = "sendBy";
     private static final String SEND_TO = "sendTo";
     private static final String SEND_DATE = "sendDate";
+    private static final String IS_SPAM = "isSpam";
+    private static final String IS_READ = "isRead";
 
     private String fileName;
     private ObservableList<Mail> mails;
     private DateTimeFormatter formatter;
 
     private MailDataHandler() {
-        formatter = DateTimeFormatter.ofPattern("dd-MM-yyyy HH:mm:ss");
+        formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
+        mails = FXCollections.observableArrayList();
     }
 
     public void setEmailData(String fileName) {
         this.fileName = fileName;
     }
+
+    public String getEmailData() { return this.fileName; }
 
     public static MailDataHandler getInstance() {
         return ourInstance;
@@ -61,7 +67,6 @@ public class MailDataHandler {
      * Observable Lis mails.
      */
     public void loadMails() {
-        mails = FXCollections.observableArrayList();
         try {
             // First we create an XMLInputFactory for process
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -110,10 +115,23 @@ public class MailDataHandler {
 
                     if (event.asStartElement().getName().getLocalPart().equals(SEND_DATE)) {
                         event = eventReader.nextEvent();
-                        LocalDate date = LocalDate.parse(event.asCharacters().getData(), formatter);
-                        mail.setSendDate(date);
+                        LocalDateTime date = LocalDateTime.parse(event.asCharacters().getData(), formatter);
+                        mail.setSendDateTime(date);
                         continue;
                     }
+
+                    if (event.asStartElement().getName().getLocalPart().equals(IS_SPAM)) {
+                        event = eventReader.nextEvent();
+                        mail.setSpam(event.asCharacters().getData().equals("true"));
+                        continue;
+                    }
+
+                    if (event.asStartElement().getName().getLocalPart().equals(IS_READ)) {
+                        event = eventReader.nextEvent();
+                        mail.setRead(event.asCharacters().getData().equals("true"));
+                        continue;
+                    }
+
                 }
 
                 // If we reach the end of a mail element, we add it to the observable list
@@ -129,8 +147,6 @@ public class MailDataHandler {
         } catch (FileNotFoundException | XMLStreamException e) {
             e.printStackTrace();
         }
-
-
     }
 
     /**
@@ -173,6 +189,26 @@ public class MailDataHandler {
         }
     }
 
+    public void saveMailsToUser(Mail mail) {
+        // A little trick to reuse code
+
+        // Set the user email to the one the mail is going to be sent
+        String currentlyUserEmail = UserData.getInstance().getUser().getEmail();
+        UserData.getInstance().setUserEmail(mail.getSendTo());
+        setEmailData(UserData.getInstance().getMailFilePath());
+
+        ObservableList<Mail> currentMails = mails;
+        mails.removeAll();
+        mails.add(mail);
+        saveMails();
+
+        // Set the state to the current user
+        mails.removeAll();
+        mails.setAll(currentMails);
+        UserData.getInstance().setUserEmail(currentlyUserEmail);
+        setEmailData(UserData.getInstance().getMailFilePath());
+    }
+
     /**
      * Saves the email into the file writen
      *
@@ -195,7 +231,9 @@ public class MailDataHandler {
         createNode(eventWriter, BODY, mail.getBody());
         createNode(eventWriter, SEND_FROM, mail.getSendBy());
         createNode(eventWriter, SEND_TO, mail.getSendTo());
-        createNode(eventWriter, SEND_DATE, mail.getSendDate().format(formatter));
+        createNode(eventWriter, SEND_DATE, mail.getSendDateTime().format(formatter));
+        createNode(eventWriter, IS_SPAM, mail.isSpam() ? "true" : "false");
+        createNode(eventWriter, IS_READ, mail.isRead() ? "true" : "false");
 
         eventWriter.add(eventFactory.createEndElement("", "", MAIL));
         eventWriter.add(end);
@@ -262,7 +300,6 @@ public class MailDataHandler {
         catch (NoSuchAlgorithmException e) {
             System.out.println("Exception thrown"
                     + " for incorrect algorithm: " + e);
-
             return null;
         }
     }

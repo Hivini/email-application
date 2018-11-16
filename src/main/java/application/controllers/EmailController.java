@@ -1,37 +1,46 @@
 package application.controllers;
 
+import application.classifier.SpamClassifier;
+import application.contentLoaders.EmailContent;
 import application.dataModels.Mail;
 import application.handlers.MailDataHandler;
+import application.handlers.SceneHandler;
 import application.handlers.UserData;
 import com.jfoenix.controls.JFXListView;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+
 import java.io.IOException;
 import java.util.Optional;
 
 public class EmailController {
 
     @FXML
+    private Button inboxButton;
+    @FXML
+    private Button spamButton;
+    @FXML
     private JFXListView<Mail> emailList;
     @FXML
     private BorderPane emailPanel;
     @FXML
-    private Label fromDetails;
-    @FXML
-    private Label subjectDetails;
-    @FXML
-    private TextArea messageDetails;
-    @FXML
     private ContextMenu listContextMenu;
 
     private FilteredList<Mail> mails;
+    private Node tempCenter;
 
     @FXML
     public void initialize() {
+
+        tempCenter = null;
 
         // Mini menu for the items on the view list
         listContextMenu = new ContextMenu();
@@ -43,27 +52,33 @@ public class EmailController {
         listContextMenu.getItems().setAll(deleteMenuItem);
 
         MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
+        //MailDataHandler.getInstance().flushEmails();
         MailDataHandler.getInstance().loadMails();
+
 
         // Add the list view listener for the selection made
         emailList.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 Mail mail = emailList.getSelectionModel().getSelectedItem();
-                fromDetails.setText(mail.getSendBy());
-                subjectDetails.setText(mail.getSubject());
-                messageDetails.setText(mail.getBody());
+                SceneHandler.setFromDetails(mail.getSendBy());
+                SceneHandler.setSubject(mail.getSubject());
+                SceneHandler.setMessage(mail.getBody());
+                System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
+                tempCenter = emailPanel.getCenter();
+                emailPanel.setCenter(new EmailContent());
             }
         }));
+
 
         mails = new FilteredList<>(MailDataHandler.getInstance().getMails(), mail -> true);
 
         // Make the list compare the set dates
         SortedList<Mail> mailsSorted = new SortedList<>(mails, (o1, o2) ->
-                o2.getSendDate().compareTo(o1.getSendDate()) < 0 ? -1 : 0);
+                o1.getSendDateTime().compareTo(o2.getSendDateTime()) > 0 ? -1 : 1);
 
         emailList.setItems(mailsSorted);
         emailList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        emailList.getSelectionModel().selectFirst();
+        //emailList.getSelectionModel().selectFirst();
 
         // Setting every cell property to show a menu
         emailList.setCellFactory(param -> {
@@ -94,6 +109,20 @@ public class EmailController {
     }
 
     @FXML
+    public void handleButtonPressed(ActionEvent e) {
+        if (e.getSource().equals(inboxButton)) {
+            if (tempCenter != null) {
+                emailPanel.setCenter(tempCenter);
+                emailList.getSelectionModel().select(null);
+                tempCenter = null;
+            }
+
+        } else if (e.getSource().equals(spamButton)) {
+            // TODO: 11/15/18 Show spam
+        }
+    }
+
+    @FXML
     public void showNewEmailDialog() {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(emailPanel.getScene().getWindow());
@@ -116,9 +145,8 @@ public class EmailController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             MailDialogController mailDialogController = loader.getController();
             Mail newMail = mailDialogController.getNewMail();
-            emailList.getSelectionModel().select(newMail);
             // TODO: 11/13/18 This should save the email to the other user
-            MailDataHandler.getInstance().saveMails();
+            MailDataHandler.getInstance().saveMailsToUser(newMail);
         }
     }
 

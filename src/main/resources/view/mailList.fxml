@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<?import com.jfoenix.controls.JFXListView?>
+<!--
+<fx:root type="BorderPane" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <JFXListView fx:id="emailList" BorderPane.alignment="CENTER"/>
+</fx:root>
+-->
+<BorderPane prefHeight="200.0" prefWidth="200.0" fx:controller="application.controllers.EmailController" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1">
+    <center>
+        <JFXListView fx:id="emailList" BorderPane.alignment="CENTER" />
+    </center>
+</BorderPane>

@@ -2,7 +2,7 @@ package application.dataModels;
 
 import javafx.beans.property.SimpleStringProperty;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author Jorge Vinicio Quintero Santos
@@ -16,18 +16,21 @@ public class Mail {
     private SimpleStringProperty body= new SimpleStringProperty("");
     private SimpleStringProperty sendBy = new SimpleStringProperty("");
     private SimpleStringProperty sendTo = new SimpleStringProperty("");
-    private LocalDate sendDate;
+    private LocalDateTime sendDateTime;
+    private boolean isSpam;
+    private boolean isRead;
 
     public Mail() {
-        // This is for the MailDataHandler
+        this.isSpam = false;
+        this.isRead = false;
     }
 
-    public Mail(String subject, String body, String sendBy, String sendTo, LocalDate sendDate) {
+    public Mail(String subject, String body, String sendBy, String sendTo, LocalDateTime sendDateTime) {
         this.subject.set(subject);
         this.body.set(body);
         this.sendBy.set(sendBy);
         this.sendTo.set(sendTo);
-        this.sendDate = sendDate;
+        this.sendDateTime = sendDateTime;
     }
 
     @Override
@@ -85,11 +88,27 @@ public class Mail {
         this.sendTo.set(sendTo);
     }
 
-    public LocalDate getSendDate() {
-        return sendDate;
+    public LocalDateTime getSendDateTime() {
+        return sendDateTime;
     }
 
-    public void setSendDate(LocalDate sendDate) {
-        this.sendDate = sendDate;
+    public void setSendDateTime(LocalDateTime sendDateTime) {
+        this.sendDateTime = sendDateTime;
+    }
+
+    public boolean isSpam() {
+        return isSpam;
+    }
+
+    public void setSpam(boolean spam) {
+        isSpam = spam;
+    }
+
+    public boolean isRead() {
+        return isRead;
+    }
+
+    public void setRead(boolean read) {
+        isRead = read;
     }
 }

@@ -19,11 +19,13 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        MailDataHandler.getInstance().saveMails();
+        if (!(MailDataHandler.getInstance().getEmailData() == null))
+            MailDataHandler.getInstance().saveMails();
     }
 
     public static void main(String[] args) {
-        // launch(args);
-        SpamClassifier classifier = new SpamClassifier();
+        SpamClassifier.getInstance().initializeData();
+        launch(args);
+
     }
 }

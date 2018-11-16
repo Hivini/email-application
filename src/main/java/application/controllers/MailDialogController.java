@@ -7,7 +7,7 @@ import com.jfoenix.controls.JFXTextArea;
 import com.jfoenix.controls.JFXTextField;
 import javafx.fxml.FXML;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 /**
  * @author Jorge Vinicio Quintero Santos
@@ -30,8 +30,8 @@ public class MailDialogController {
         String subject = subjectField.getText();
         String message = messageArea.getText();
 
-        Mail mail = new Mail(subject, message, send_by, send_to, LocalDate.now());
-        MailDataHandler.getInstance().addMail(mail);
+        Mail mail = new Mail(subject, message, send_by, send_to, LocalDateTime.now());
+        //MailDataHandler.getInstance().addMail(mail);
         return mail;
     }
 }
