@@ -1,22 +1,22 @@
 package application.controllers;
 
-import application.classifier.SpamClassifier;
 import application.contentLoaders.EmailContent;
 import application.dataModels.Mail;
 import application.handlers.MailDataHandler;
 import application.handlers.SceneHandler;
 import application.handlers.UserData;
 import com.jfoenix.controls.JFXListView;
+import javafx.collections.FXCollections;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -40,7 +40,8 @@ public class EmailController {
     @FXML
     public void initialize() {
 
-        tempCenter = null;
+        // Process the pending emails of the user in case they have some
+        processUserEmails();
 
         // Mini menu for the items on the view list
         listContextMenu = new ContextMenu();
@@ -52,9 +53,7 @@ public class EmailController {
         listContextMenu.getItems().setAll(deleteMenuItem);
 
         MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
-        //MailDataHandler.getInstance().flushEmails();
-        MailDataHandler.getInstance().loadMails();
-
+        MailDataHandler.getInstance().loadMails(false);
 
         // Add the list view listener for the selection made
         emailList.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
@@ -63,7 +62,7 @@ public class EmailController {
                 SceneHandler.setFromDetails(mail.getSendBy());
                 SceneHandler.setSubject(mail.getSubject());
                 SceneHandler.setMessage(mail.getBody());
-                System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
+                //System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
                 tempCenter = emailPanel.getCenter();
                 emailPanel.setCenter(new EmailContent());
             }
@@ -78,7 +77,7 @@ public class EmailController {
 
         emailList.setItems(mailsSorted);
         emailList.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        //emailList.getSelectionModel().selectFirst();
+        mails.setPredicate(mail -> !mail.isSpam());
 
         // Setting every cell property to show a menu
         emailList.setCellFactory(param -> {
@@ -95,13 +94,8 @@ public class EmailController {
                 }
             };
 
-            cell.emptyProperty().addListener((obs, wasEmpty, isNowEmpty) -> {
-                if (isNowEmpty) {
-                    cell.setContextMenu(null);
-                } else {
-                    cell.setContextMenu(listContextMenu);
-                }
-            });
+            cell.setOnContextMenuRequested(event ->
+                    listContextMenu.show(cell, event.getScreenX(), event.getScreenY()));
 
             // The method must return a cell
             return cell;
@@ -110,15 +104,15 @@ public class EmailController {
 
     @FXML
     public void handleButtonPressed(ActionEvent e) {
-        if (e.getSource().equals(inboxButton)) {
-            if (tempCenter != null) {
-                emailPanel.setCenter(tempCenter);
-                emailList.getSelectionModel().select(null);
-                tempCenter = null;
-            }
+        // Change the view
+        if (tempCenter != null) setCenterNode();
 
+        if (e.getSource().equals(inboxButton)) {
+            mails.setPredicate(mail -> !mail.isSpam());
         } else if (e.getSource().equals(spamButton)) {
-            // TODO: 11/15/18 Show spam
+            if (!mails.isEmpty()) {
+                mails.setPredicate(Mail::isSpam);
+            }
         }
     }
 
@@ -145,9 +139,32 @@ public class EmailController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             MailDialogController mailDialogController = loader.getController();
             Mail newMail = mailDialogController.getNewMail();
-            // TODO: 11/13/18 This should save the email to the other user
             MailDataHandler.getInstance().saveMailsToUser(newMail);
         }
+    }
+
+    @FXML
+    public void signOut() {
+        MailDataHandler.getInstance().getMails().clear();
+        emailList.getSelectionModel().clearSelection();
+        mails.clear();
+        UserData.getInstance().resetUser();
+
+        // Change to login screen
+        Stage currentStage = (Stage) (emailPanel.getScene().getWindow());
+        Parent emailResource = null;
+        try {
+            emailResource = FXMLLoader.load(getClass().getResource("/view/loginLayout.fxml"));
+        } catch (IOException e) {
+            System.out.println("The login file wasn't found");
+            e.printStackTrace();
+        }
+        SceneHandler.changeScene(currentStage, emailResource, "Login");
+    }
+
+    private void processUserEmails() {
+        MailDataHandler.getInstance().setEmailData(UserData.getInstance().getUserPendingPath());
+        MailDataHandler.getInstance().loadMails(true);
     }
 
     private void deleteMail(Mail mail) {
@@ -160,6 +177,12 @@ public class EmailController {
         if (result.isPresent() && result.get() == ButtonType.OK) {
             MailDataHandler.getInstance().deleteMail(mail);
         }
+    }
+
+    private void setCenterNode() {
+        emailPanel.setCenter(tempCenter);
+        emailList.getSelectionModel().select(null);
+        tempCenter = null;
     }
 
 }

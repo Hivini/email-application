@@ -1,5 +1,6 @@
 package application.handlers;
 
+import application.classifier.SpamClassifier;
 import application.dataModels.Mail;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -66,7 +67,7 @@ public class MailDataHandler {
      * Reads the xml file and creates the mail objects, every time the mail object data is loaded it adds it to the
      * Observable Lis mails.
      */
-    public void loadMails() {
+    public void loadMails(boolean needsClassify) {
         try {
             // First we create an XMLInputFactory for process
             XMLInputFactory inputFactory = XMLInputFactory.newInstance();
@@ -138,6 +139,10 @@ public class MailDataHandler {
                 if (event.isEndElement()) {
                     EndElement endElement = event.asEndElement();
                     if (endElement.getName().getLocalPart().equals(MAIL)) {
+                        if (needsClassify) {
+                            boolean spam = SpamClassifier.getInstance().isSpam(mail.getBody());
+                            if (spam) mail.setSpam(spam);
+                        }
                         mails.add(mail);
                     }
                 }
@@ -147,12 +152,48 @@ public class MailDataHandler {
         } catch (FileNotFoundException | XMLStreamException e) {
             e.printStackTrace();
         }
+
+        // Clear the pending file
+        if (needsClassify) {
+            setEmailData(UserData.getInstance().getUserPendingPath());
+            // Empty the pending creating a new one to avoid concurrent exception
+            try {
+                // Create the factory
+                XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
+                // Create the writer
+                XMLEventWriter eventWriter = outputFactory.createXMLEventWriter(new FileOutputStream(fileName));
+                // Create the event factory to process every line
+                XMLEventFactory eventFactory = XMLEventFactory.newInstance();
+                // The end of every XML part
+                XMLEvent end = eventFactory.createDTD("\n");
+                // Create and write Start Tag
+                StartDocument startDocument = eventFactory.createStartDocument();
+                eventWriter.add(startDocument);
+                eventWriter.add(end);
+
+                StartElement mailsStartElement = eventFactory.createStartElement("", "", "mails");
+                eventWriter.add(mailsStartElement);
+                eventWriter.add(end);
+
+                eventWriter.add(eventFactory.createEndElement("", "", "mails"));
+                eventWriter.add(end);
+                eventWriter.add(eventFactory.createEndDocument());
+                eventWriter.close();
+
+
+            } catch (FileNotFoundException | XMLStreamException e) {
+                e.printStackTrace();
+            }
+
+            setEmailData(UserData.getInstance().getMailFilePath());
+        }
     }
 
     /**
      * Transform the ObservableList mails into a XML file.
      */
     public void saveMails() {
+        System.out.println("Saving mails");
         try {
             // Create the factory
             XMLOutputFactory outputFactory = XMLOutputFactory.newInstance();
@@ -191,14 +232,16 @@ public class MailDataHandler {
 
     public void saveMailsToUser(Mail mail) {
         // A little trick to reuse code
-
+        // FIXME: 11/15/18 Check what happens when the user doesn't exists
         // Set the user email to the one the mail is going to be sent
         String currentlyUserEmail = UserData.getInstance().getUser().getEmail();
         UserData.getInstance().setUserEmail(mail.getSendTo());
-        setEmailData(UserData.getInstance().getMailFilePath());
+        setEmailData(UserData.getInstance().getUserPendingPath());
 
-        ObservableList<Mail> currentMails = mails;
-        mails.removeAll();
+        ObservableList<Mail> currentMails = FXCollections.observableArrayList();
+        currentMails.setAll(mails);
+        mails.clear();
+        loadMails(false);
         mails.add(mail);
         saveMails();
 

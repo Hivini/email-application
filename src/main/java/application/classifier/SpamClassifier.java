@@ -55,14 +55,16 @@ public class SpamClassifier {
             return;
         }
 
+        // This values are hardcoded because of memory limitations,
+        // but I managed to get a decent a accuracy with these settings.
         int counter = 0;
-        while (counter++ < 700) {
+        while (counter++ < 800) {
             String[] message = hamMessages.pop().split("\\s");
             bayes.learn("ham", Arrays.asList(message));
         }
 
         counter = 0;
-        while (!spamMessages.isEmpty() && counter++ < 300) {
+        while (!spamMessages.isEmpty() && counter++ < 200) {
             String[] message = spamMessages.pop().split("\\s");
             bayes.learn("spam", Arrays.asList(message));
         }
@@ -94,7 +96,6 @@ public class SpamClassifier {
             if (bayes.classify(Arrays.asList(test.split("\\s"))).getCategory().equals("spam")) correct++;
         }
 
-        // FIXME: 11/15/18 Accuracy low
         System.out.println("Accuracy: " + ((double)correct / (double)originalSize));
     }
 
@@ -126,14 +127,13 @@ public class SpamClassifier {
         String[] data;
 
         int counter = 0;
-        while ((line = br.readLine()) != null && counter < 1000) {
+        while ((line = br.readLine()) != null) {
             data = line.split(",");
             // If the data is ham, we will push the message to the position 0, otherwise to the position 2
             if (data[1].equals("ham"))
                 arrayOfData[0].push(data[0]);
             else
                 arrayOfData[1].push(data[0]);
-            counter++;
         }
 
         br.close();

@@ -61,6 +61,10 @@ public class RegisterController {
                     // Make the directories for the files
                     if (file.mkdirs()) {
                         try {
+                            // Set the pending mails file
+                            MailDataHandler.getInstance().setEmailData(UserData.getInstance().getUserPendingPath());
+                            MailDataHandler.getInstance().saveMails();
+                            // Set the mails file
                             MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
                             MailDataHandler.getInstance().saveMails();
 

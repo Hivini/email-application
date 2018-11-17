@@ -30,8 +30,7 @@ public class MailDialogController {
         String subject = subjectField.getText();
         String message = messageArea.getText();
 
-        Mail mail = new Mail(subject, message, send_by, send_to, LocalDateTime.now());
         //MailDataHandler.getInstance().addMail(mail);
-        return mail;
+        return new Mail(subject, message, send_by, send_to, LocalDateTime.now());
     }
 }

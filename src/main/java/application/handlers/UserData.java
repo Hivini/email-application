@@ -14,6 +14,15 @@ public class UserData {
     private UserData() {
     }
 
+    public void setUserName(String firstName, String lastName) {
+        user.setFirstName(firstName);
+        user.setLastName(lastName);
+    }
+
+    public void setUserEmail(String email) {
+        user.setEmail(email);
+    }
+
     /**
      * The path of the directory will be the email
      * @return The email value
@@ -21,6 +30,10 @@ public class UserData {
     public String getUserDirectory() {
         // Returns db + the email username
         return "./db/" + user.getEmail().split("@")[0];
+    }
+
+    public void resetUser() {
+        user = new User();
     }
 
     public String getMailFilePath() {
@@ -31,14 +44,7 @@ public class UserData {
         return getUserDirectory() + "/users.csv";
     }
 
-    public void setUserName(String firstName, String lastName) {
-        user.setFirstName(firstName);
-        user.setLastName(lastName);
-    }
-
-    public void setUserEmail(String email) {
-        user.setEmail(email);
-    }
+    public String getUserPendingPath() { return getUserDirectory() + "/pending.xml"; }
 
     public User getUser() {
         return user;
