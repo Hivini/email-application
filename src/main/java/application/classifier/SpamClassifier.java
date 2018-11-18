@@ -1,5 +1,6 @@
 package application.classifier;
 
+import application.dataModels.Mail;
 import application.handlers.UserData;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;
@@ -103,6 +104,10 @@ public class SpamClassifier {
         return bayes.classify(Arrays.asList(message.split("\\s"))).getCategory().equals("spam");
     }
 
+    public void addSpamMail(String message) {
+        bayes.learn("spam", Arrays.asList(message.trim().split("\\s")));
+    }
+
     private void processData(Stack<String>[] arrayOfData, String filePath) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(filePath));
         String line;
@@ -126,7 +131,6 @@ public class SpamClassifier {
         String line;
         String[] data;
 
-        int counter = 0;
         while ((line = br.readLine()) != null) {
             data = line.split(",");
             // If the data is ham, we will push the message to the position 0, otherwise to the position 2

@@ -1,5 +1,6 @@
 package application.controllers;
 
+import application.classifier.SpamClassifier;
 import application.contentLoaders.EmailContent;
 import application.dataModels.Mail;
 import application.handlers.MailDataHandler;
@@ -30,6 +31,8 @@ public class EmailController {
     @FXML
     private Button spamButton;
     @FXML
+    private Button refreshButton;
+    @FXML
     private JFXListView<Mail> emailList;
     @FXML
     private BorderPane emailPanel;
@@ -50,44 +53,44 @@ public class EmailController {
 
         // Mini menu for the items on the view list
         listContextMenu = new ContextMenu();
+
         MenuItem deleteMenuItem = new MenuItem("Delete");
         deleteMenuItem.setOnAction(event -> {
             Mail mail = emailList.getSelectionModel().getSelectedItem();
             deleteMail(mail);
         });
-        listContextMenu.getItems().setAll(deleteMenuItem);
+
+        MenuItem markAsSpamItem = new MenuItem("Mark as Spam");
+        markAsSpamItem.setOnAction(event -> {
+            emailList.getSelectionModel().getSelectedItem().setSpam(true);
+            Mail mail = emailList.getSelectionModel().getSelectedItem();
+            markAsSpam(mail);
+            listContextMenu.hide();
+            mails.setPredicate(mailTo -> !mailTo.isSpam());
+        });
+
+        listContextMenu.getItems().setAll(deleteMenuItem, markAsSpamItem);
 
         MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
         MailDataHandler.getInstance().loadMails(false);
+        MailDataHandler.getInstance().saveMails();
 
         // Add the list view listener for the selection made
         emailList.setOnMouseClicked(event -> {
             if (event.getButton() == MouseButton.PRIMARY) {
-                // In case the context menu is open
-                listContextMenu.hide();
-                Mail mail = emailList.getSelectionModel().getSelectedItem();
-                SceneHandler.setFromDetails(mail.getSendBy());
-                SceneHandler.setSubject(mail.getSubject());
-                SceneHandler.setMessage(mail.getBody());
-                //System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
-                tempCenter = emailPanel.getCenter();
-                emailPanel.setCenter(new EmailContent());
+                if (emailList.getSelectionModel().getSelectedItem() != null) {
+                    // In case the context menu is open
+                    listContextMenu.hide();
+                    Mail mail = emailList.getSelectionModel().getSelectedItem();
+                    SceneHandler.setFromDetails(mail.getSendBy());
+                    SceneHandler.setSubject(mail.getSubject());
+                    SceneHandler.setMessage(mail.getBody());
+                    //System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
+                    tempCenter = emailPanel.getCenter();
+                    emailPanel.setCenter(new EmailContent());
+                }
             }
         });
-        // TODO: 11/18/18 Check if I don't need this
-        /*
-        emailList.getSelectionModel().selectedItemProperty().addListener(((observable, oldValue, newValue) -> {
-            if (newValue != null) {
-                Mail mail = emailList.getSelectionModel().getSelectedItem();
-                SceneHandler.setFromDetails(mail.getSendBy());
-                SceneHandler.setSubject(mail.getSubject());
-                SceneHandler.setMessage(mail.getBody());
-                //System.out.println(SpamClassifier.getInstance().isSpam(mail.getBody()));
-                tempCenter = emailPanel.getCenter();
-                emailPanel.setCenter(new EmailContent());
-            }
-        }));*/
-
 
         mails = new FilteredList<>(MailDataHandler.getInstance().getMails(), mail -> true);
 
@@ -137,6 +140,8 @@ public class EmailController {
             if (!mails.isEmpty()) {
                 mails.setPredicate(Mail::isSpam);
             }
+        } else if (e.getSource().equals(refreshButton)) {
+            handleRefresh();
         }
     }
 
@@ -159,8 +164,6 @@ public class EmailController {
         dialog.getDialogPane().getButtonTypes().add(ButtonType.CANCEL);
         dialog.getDialogPane().getButtonTypes().add(ButtonType.OK);
 
-        boolean keepDialog = true;
-
         final Button buttonOk = (Button) dialog.getDialogPane().lookupButton(ButtonType.OK);
         buttonOk.addEventFilter(ActionEvent.ACTION, event -> {
             MailDialogController mailDialogController = loader.getController();
@@ -179,21 +182,6 @@ public class EmailController {
             MailDataHandler.getInstance().saveMailsToUser(newMail);
 
         }
-
-        /*
-        while (keepDialog) {
-
-            if (result.isPresent() && result.get() == ButtonType.OK) {
-                MailDialogController mailDialogController = loader.getController();
-                Mail newMail = mailDialogController.getNewMail();
-                if (newMail != null) {
-                    MailDataHandler.getInstance().saveMailsToUser(newMail);
-                    keepDialog = false;
-                } else {
-                    System.out.println("I'm depressed");
-                }
-            }
-        }*/
     }
 
     @FXML
@@ -215,6 +203,15 @@ public class EmailController {
             e.printStackTrace();
         }
         SceneHandler.changeScene(currentStage, emailResource, "Login");
+    }
+
+    private void markAsSpam(Mail mail) {
+        SpamClassifier.getInstance().addSpamMail(mail.getBody());
+        MailDataHandler.getInstance().saveMails();
+    }
+
+    private void handleRefresh() {
+        MailDataHandler.getInstance().refreshMails();
     }
 
     private void processUserEmails() {

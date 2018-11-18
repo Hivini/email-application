@@ -10,16 +10,14 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 
 <BorderPane fx:id="emailPanel" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.EmailController">
    <top>
-      <JFXToolbar BorderPane.alignment="TOP_LEFT">
-         <left>
-            <JFXButton onAction="#showNewEmailDialog" text="New Email" />
-         </left>
-         <top>
-            <MenuBar BorderPane.alignment="CENTER">
+      <VBox BorderPane.alignment="TOP_LEFT">
+         <children>
+            <MenuBar>
               <menus>
                 <Menu mnemonicParsing="false" text="File">
                   <items>
@@ -38,15 +36,25 @@
                 </Menu>
               </menus>
             </MenuBar>
-         </top>
-         <right>
-            <Label fx:id="userName" BorderPane.alignment="CENTER">
-               <padding>
-                  <Insets right="20.0" />
-               </padding>
-            </Label>
-         </right>
-      </JFXToolbar>
+            <JFXToolbar>
+               <left>
+                  <HBox>
+                     <children>
+                        <JFXButton onAction="#showNewEmailDialog" text="New Email" />
+                        <JFXButton fx:id="refreshButton" onAction="#handleButtonPressed" text="Refresh" />
+                     </children>
+                  </HBox>
+               </left>
+               <right>
+                  <Label fx:id="userName" BorderPane.alignment="CENTER">
+                     <padding>
+                        <Insets right="20.0" />
+                     </padding>
+                  </Label>
+               </right>
+            </JFXToolbar>
+         </children>
+      </VBox>
    </top>
 
    <center>

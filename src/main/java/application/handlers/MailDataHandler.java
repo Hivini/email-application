@@ -14,6 +14,8 @@ import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -60,6 +62,7 @@ public class MailDataHandler {
 
     public void deleteMail(Mail item) {
         mails.remove(item);
+        saveMails();
     }
 
     /**
@@ -231,7 +234,6 @@ public class MailDataHandler {
 
     public void saveMailsToUser(Mail mail) {
         // A little trick to reuse code
-        // FIXME: 11/15/18 Check what happens when the user doesn't exists
         // Set the user email to the one the mail is going to be sent
         String currentlyUserEmail = UserData.getInstance().getUser().getEmail();
         UserData.getInstance().setUserEmail(mail.getSendTo());
@@ -310,8 +312,36 @@ public class MailDataHandler {
         eventWriter.add(end);
     }
 
-    public ObservableList<Mail> getMails() {
-        return mails;
+    public void refreshMails() {
+        mails.clear();
+        setEmailData(UserData.getInstance().getUserPendingPath());
+        loadMails(true);
+        loadMails(false);
+        saveMails();
+        /*
+        // Create a temporal array with the current mails
+        ObservableList<Mail> currentMails = FXCollections.observableArrayList();
+        currentMails.setAll(mails);
+        mails.clear();
+
+        // Load the pending mails if they exist
+        loadMails(true);
+        // Create to hash sets to compare them and efficiently merge if necessary
+        HashSet<Mail> currentMailHashSet = new HashSet<>(currentMails);
+        HashSet<Mail> newMailHashSet = new HashSet<>(currentMails);
+
+        // Check if there are changes
+        if (currentMailHashSet.equals(newMailHashSet)) {
+            System.out.println("They are equal");
+        } else {
+            Iterator iterator = newMailHashSet.iterator();
+        }
+        saveMails();
+
+        // Set the state to the current user
+        mails.removeAll();
+        mails.setAll(currentMails);
+        */
     }
 
     public static boolean validateEmail(String email) {
@@ -356,5 +386,9 @@ public class MailDataHandler {
 
     public void setHasSignOut(boolean hasSignOut) {
         this.hasSignOut = hasSignOut;
+    }
+
+    public ObservableList<Mail> getMails() {
+        return mails;
     }
 }
