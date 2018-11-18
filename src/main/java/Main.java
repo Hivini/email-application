@@ -19,7 +19,8 @@ public class Main extends Application {
 
     @Override
     public void stop() throws Exception {
-        if (!(MailDataHandler.getInstance().getEmailData() == null))
+        // !(MailDataHandler.getInstance().getEmailData() == null)
+        if (!MailDataHandler.getInstance().isHasSignOut())
             MailDataHandler.getInstance().saveMails();
     }
 

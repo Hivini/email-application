@@ -19,6 +19,7 @@
             <JFXTextArea fx:id="messageArea" layoutX="123.0" layoutY="186.0" />
             <Label layoutX="125.0" layoutY="99.0" text="Subject:" />
             <Label layoutX="123.0" layoutY="169.0" text="Message" />
+            <Label fx:id="errorLabel" layoutX="133.0" layoutY="25.0" textFill="#943131" />
          </children></AnchorPane>
    </content>
 </DialogPane>

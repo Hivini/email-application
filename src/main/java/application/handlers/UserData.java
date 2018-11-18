@@ -29,7 +29,8 @@ public class UserData {
      */
     public String getUserDirectory() {
         // Returns db + the email username
-        return "./db/" + user.getEmail().split("@")[0];
+        String[] userDir = user.getEmail().split("\\.");
+        return "./db/" + userDir[0] + "$" + userDir[1];
     }
 
     public void resetUser() {

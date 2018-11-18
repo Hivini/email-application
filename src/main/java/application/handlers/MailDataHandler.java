@@ -7,10 +7,7 @@ import javafx.collections.ObservableList;
 
 import javax.xml.stream.*;
 import javax.xml.stream.events.*;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -39,10 +36,12 @@ public class MailDataHandler {
     private String fileName;
     private ObservableList<Mail> mails;
     private DateTimeFormatter formatter;
+    private boolean hasSignOut;
 
     private MailDataHandler() {
         formatter = DateTimeFormatter.ofLocalizedDateTime(FormatStyle.MEDIUM);
         mails = FXCollections.observableArrayList();
+        hasSignOut = false;
     }
 
     public void setEmailData(String fileName) {
@@ -237,17 +236,21 @@ public class MailDataHandler {
         String currentlyUserEmail = UserData.getInstance().getUser().getEmail();
         UserData.getInstance().setUserEmail(mail.getSendTo());
         setEmailData(UserData.getInstance().getUserPendingPath());
+        if (new File(getEmailData()).exists()) {
+            ObservableList<Mail> currentMails = FXCollections.observableArrayList();
+            currentMails.setAll(mails);
+            mails.clear();
+            loadMails(false);
+            mails.add(mail);
+            saveMails();
 
-        ObservableList<Mail> currentMails = FXCollections.observableArrayList();
-        currentMails.setAll(mails);
-        mails.clear();
-        loadMails(false);
-        mails.add(mail);
-        saveMails();
+            // Set the state to the current user
+            mails.removeAll();
+            mails.setAll(currentMails);
+        } else {
+            System.out.println("The user does not exists");
+        }
 
-        // Set the state to the current user
-        mails.removeAll();
-        mails.setAll(currentMails);
         UserData.getInstance().setUserEmail(currentlyUserEmail);
         setEmailData(UserData.getInstance().getMailFilePath());
     }
@@ -345,5 +348,13 @@ public class MailDataHandler {
                     + " for incorrect algorithm: " + e);
             return null;
         }
+    }
+
+    public boolean isHasSignOut() {
+        return hasSignOut;
+    }
+
+    public void setHasSignOut(boolean hasSignOut) {
+        this.hasSignOut = hasSignOut;
     }
 }

@@ -25,12 +25,15 @@ public class MailDialogController {
     private JFXTextArea messageArea;
 
     public Mail getNewMail() {
-        String send_to = toField.getText();
-        String send_by = UserData.getInstance().getUser().getEmail();
-        String subject = subjectField.getText();
-        String message = messageArea.getText();
+        if (MailDataHandler.validateEmail(toField.getText().trim())) {
+            String send_to = toField.getText();
+            String send_by = UserData.getInstance().getUser().getEmail();
+            String subject = subjectField.getText();
+            String message = messageArea.getText();
 
-        //MailDataHandler.getInstance().addMail(mail);
-        return new Mail(subject, message, send_by, send_to, LocalDateTime.now());
+            //MailDataHandler.getInstance().addMail(mail);
+            return new Mail(subject, message, send_by, send_to, LocalDateTime.now());
+        }
+        return null;
     }
 }

@@ -46,7 +46,6 @@ public class LoginController {
         Stage currentStage = (Stage) ((Node)e.getSource()).getScene().getWindow();
 
         if (e.getSource() == loginButton) {
-            // TODO: 11/13/18 The user can login without the same domain. Ex. haha@gmail.com can be entered with haha@outlook.es
             // If is an email proceed with the operation
             if (MailDataHandler.validateEmail(emailField.getText())) {
                 UserData.getInstance().setUserEmail(emailField.getText());
@@ -56,6 +55,7 @@ public class LoginController {
                 if (file.isDirectory()) {
                     try {
                         if (validatePassword(passwordField.getText())) {
+                            MailDataHandler.getInstance().setHasSignOut(false);
                             this.changeToEmailScene(currentStage);
                         } else {
                             errorLabel.setText("Email or password is wrong");

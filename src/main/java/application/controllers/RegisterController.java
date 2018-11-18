@@ -44,12 +44,11 @@ public class RegisterController {
         // Get the current stage where the button is
         Stage currentStage = (Stage) ((Node)e.getSource()).getScene().getWindow();
 
-        // FIXME: 11/13/18 There's a chance that the user can just input empty spaces
         if (e.getSource() == registerButton &&
-                !firstNameField.getText().equals("") &&
-                !lastNameField.getText().equals("") &&
-                !emailField.getText().equals("") &&
-                !passwordField.getText().equals("")) {
+                !firstNameField.getText().trim().equals("") &&
+                !lastNameField.getText().trim().equals("") &&
+                !emailField.getText().trim().equals("") &&
+                !passwordField.getText().trim().equals("")) {
 
             if (MailDataHandler.validateEmail(emailField.getText())) {
                 UserData.getInstance().setUserEmail(emailField.getText());
