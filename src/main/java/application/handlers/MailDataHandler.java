@@ -318,30 +318,6 @@ public class MailDataHandler {
         loadMails(true);
         loadMails(false);
         saveMails();
-        /*
-        // Create a temporal array with the current mails
-        ObservableList<Mail> currentMails = FXCollections.observableArrayList();
-        currentMails.setAll(mails);
-        mails.clear();
-
-        // Load the pending mails if they exist
-        loadMails(true);
-        // Create to hash sets to compare them and efficiently merge if necessary
-        HashSet<Mail> currentMailHashSet = new HashSet<>(currentMails);
-        HashSet<Mail> newMailHashSet = new HashSet<>(currentMails);
-
-        // Check if there are changes
-        if (currentMailHashSet.equals(newMailHashSet)) {
-            System.out.println("They are equal");
-        } else {
-            Iterator iterator = newMailHashSet.iterator();
-        }
-        saveMails();
-
-        // Set the state to the current user
-        mails.removeAll();
-        mails.setAll(currentMails);
-        */
     }
 
     public static boolean validateEmail(String email) {

@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Scanner;
 import java.util.Stack;
 
@@ -46,7 +47,7 @@ public class SpamClassifier {
 
         // Training the model
         try {
-            processTestData(processedTestData, "./data/trainingSpamCorpus.txt");
+            processTestData(processedTestData, "./data/testSpamCorpusBig.txt");
             hamMessages = processedTestData[0];
             spamMessages = processedTestData[1];
 
@@ -58,6 +59,8 @@ public class SpamClassifier {
 
         // This values are hardcoded because of memory limitations,
         // but I managed to get a decent a accuracy with these settings.
+        // After a little bit of experiments with the data is better to have a low amount of
+        // data of the spam to have a better accuracy
         int counter = 0;
         while (counter++ < 800) {
             String[] message = hamMessages.pop().split("\\s");
@@ -69,7 +72,6 @@ public class SpamClassifier {
             String[] message = spamMessages.pop().split("\\s");
             bayes.learn("spam", Arrays.asList(message));
         }
-
         // Testing the model
 
         try {
@@ -104,8 +106,8 @@ public class SpamClassifier {
         return bayes.classify(Arrays.asList(message.split("\\s"))).getCategory().equals("spam");
     }
 
-    public void addSpamMail(String message) {
-        bayes.learn("spam", Arrays.asList(message.trim().split("\\s")));
+    public void addSpamMail(String type, String message) {
+        bayes.learn(type, Arrays.asList(message.trim().split("\\s")));
     }
 
     private void processData(Stack<String>[] arrayOfData, String filePath) throws IOException {
@@ -138,6 +140,7 @@ public class SpamClassifier {
                 arrayOfData[0].push(data[0]);
             else
                 arrayOfData[1].push(data[0]);
+
         }
 
         br.close();

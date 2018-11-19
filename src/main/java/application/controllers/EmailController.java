@@ -41,6 +41,7 @@ public class EmailController {
 
     private FilteredList<Mail> mails;
     private Node tempCenter;
+    private boolean inSpamInbox;
 
     @FXML
     public void initialize() {
@@ -50,6 +51,7 @@ public class EmailController {
                 UserData.getInstance().getUser().getLastName());
         // Process the pending emails of the user in case they have some
         processUserEmails();
+        inSpamInbox = false;
 
         // Mini menu for the items on the view list
         listContextMenu = new ContextMenu();
@@ -60,16 +62,16 @@ public class EmailController {
             deleteMail(mail);
         });
 
-        MenuItem markAsSpamItem = new MenuItem("Mark as Spam");
+        MenuItem markAsSpamItem = new MenuItem("Mark/Unmark as Spam");
         markAsSpamItem.setOnAction(event -> {
-            emailList.getSelectionModel().getSelectedItem().setSpam(true);
+            emailList.getSelectionModel().getSelectedItem().setSpam(!inSpamInbox);
             Mail mail = emailList.getSelectionModel().getSelectedItem();
-            markAsSpam(mail);
+            markAsSpam((inSpamInbox ? "ham" : "spam") ,mail);
             listContextMenu.hide();
             mails.setPredicate(mailTo -> !mailTo.isSpam());
         });
 
-        listContextMenu.getItems().setAll(deleteMenuItem, markAsSpamItem);
+        listContextMenu.getItems().setAll(markAsSpamItem, deleteMenuItem);
 
         MailDataHandler.getInstance().setEmailData(UserData.getInstance().getMailFilePath());
         MailDataHandler.getInstance().loadMails(false);
@@ -136,9 +138,11 @@ public class EmailController {
 
         if (e.getSource().equals(inboxButton)) {
             mails.setPredicate(mail -> !mail.isSpam());
+            inSpamInbox = false;
         } else if (e.getSource().equals(spamButton)) {
             if (!mails.isEmpty()) {
                 mails.setPredicate(Mail::isSpam);
+                inSpamInbox = true;
             }
         } else if (e.getSource().equals(refreshButton)) {
             handleRefresh();
@@ -205,8 +209,8 @@ public class EmailController {
         SceneHandler.changeScene(currentStage, emailResource, "Login");
     }
 
-    private void markAsSpam(Mail mail) {
-        SpamClassifier.getInstance().addSpamMail(mail.getBody());
+    private void markAsSpam(String type, Mail mail) {
+        SpamClassifier.getInstance().addSpamMail(type, mail.getBody());
         MailDataHandler.getInstance().saveMails();
     }
 
