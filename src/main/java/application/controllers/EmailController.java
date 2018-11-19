@@ -46,6 +46,10 @@ public class EmailController {
     @FXML
     public void initialize() {
 
+        //Start with inbox selected
+        inboxButton.getStyleClass().removeAll("normalButton");
+        inboxButton.getStyleClass().add("selectedButton");
+
         // Setting the label to the name of the user for reference
         userName.setText(UserData.getInstance().getUser().getFirstName() + " " +
                 UserData.getInstance().getUser().getLastName());
@@ -139,11 +143,20 @@ public class EmailController {
         if (e.getSource().equals(inboxButton)) {
             mails.setPredicate(mail -> !mail.isSpam());
             inSpamInbox = false;
+            inboxButton.getStyleClass().removeAll("normalButton");
+            inboxButton.getStyleClass().add("selectedButton");
+            spamButton.getStyleClass().removeAll("selectedButton");
+            spamButton.getStyleClass().add("normalButton");
+
         } else if (e.getSource().equals(spamButton)) {
             if (!mails.isEmpty()) {
                 mails.setPredicate(Mail::isSpam);
                 inSpamInbox = true;
             }
+            spamButton.getStyleClass().removeAll("normalButton");
+            spamButton.getStyleClass().add("selectedButton");
+            inboxButton.getStyleClass().removeAll("selectedButton");
+            inboxButton.getStyleClass().add("normalButton");
         } else if (e.getSource().equals(refreshButton)) {
             handleRefresh();
         }
@@ -154,6 +167,7 @@ public class EmailController {
         Dialog<ButtonType> dialog = new Dialog<>();
         dialog.initOwner(emailPanel.getScene().getWindow());
         dialog.setTitle("New Email");
+        dialog.setHeaderText("Fill the information of the new Mail");
         FXMLLoader loader =new FXMLLoader();
         loader.setLocation(getClass().getResource("/view/mailDialog.fxml"));
 
@@ -240,5 +254,4 @@ public class EmailController {
         emailList.getSelectionModel().select(null);
         tempCenter = null;
     }
-
 }

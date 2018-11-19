@@ -1,0 +1,22 @@
+.inboxBox {
+    -fx-background-color: #F4F4F4;
+    -fx-border-color: #eaeaea;
+    -fx-border-width: 1px;
+}
+
+#newMailButton, #refreshButton {
+    -fx-text-fill: #133363;
+}
+
+#messageDialog {
+    -fx-background-color: white;
+}
+
+.normalButton:hover {
+    -fx-background-color: #ebebeb;
+}
+
+.selectedButton {
+    -fx-text-fill: #1a4382;
+    -fx-background-color: #A7BBDA;
+}

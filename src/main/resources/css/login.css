@@ -1,3 +1,16 @@
 #anchorPane {
-    -fx-background-color: #8a91ff;
+    -fx-background-color: #F4F4F4;
+}
+
+/*Raised button example */
+.jfx-button {
+    -jfx-button-type: RAISED;
+    -fx-background-color: #194382;
+    -fx-text-fill: white;
+    -fx-padding: 10px;
+    -fx-font-size: 14px;
+}
+
+#emailField, #passwordField {
+    -fx-background-color: #ebebeb;
 }

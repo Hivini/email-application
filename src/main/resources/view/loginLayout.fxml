@@ -8,19 +8,30 @@
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.LoginController">
+<BorderPane stylesheets="@../css/login.css" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="application.controllers.LoginController">
    <center>
       <AnchorPane id="anchorPane" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="720.0" prefWidth="1280.0" stylesheets="@../css/login.css">
          <children>
-            <Label layoutX="624.0" layoutY="217.0" text="Email" />
-            <Label layoutX="610.0" layoutY="311.0" text="Password" />
-            <JFXPasswordField fx:id="passwordField" layoutX="519.0" layoutY="338.0" prefHeight="27.0" prefWidth="242.0" />
-            <JFXTextField fx:id="emailField" layoutX="519.0" layoutY="243.0" prefHeight="27.0" prefWidth="242.0" />
-            <JFXButton fx:id="loginButton" defaultButton="true" layoutX="614.0" layoutY="406.0" onAction="#handleButtonPressed" ripplerFill="#405aa8" text="Login" />
-            <JFXButton fx:id="registerButton" layoutX="1134.0" layoutY="64.0" onAction="#handleButtonPressed" text="Register" textFill="WHITE" />
+            <Label id="emailLabel" layoutX="622.0" layoutY="217.0" text="Email">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <Label id="passwordLabel" layoutX="608.0" layoutY="311.0" text="Password">
+               <font>
+                  <Font name="System Bold" size="14.0" />
+               </font></Label>
+            <JFXPasswordField id="passwordField" fx:id="passwordField" layoutX="520.0" layoutY="339.0" prefHeight="27.0" prefWidth="242.0" promptText="Password" stylesheets="@../css/login.css" />
+            <JFXTextField id="passwordField" fx:id="emailField" layoutX="520.0" layoutY="243.0" prefHeight="27.0" prefWidth="242.0" promptText="Email address" stylesheets="@../css/login.css" />
+            <JFXButton id="loginButton" fx:id="loginButton" buttonType="RAISED" defaultButton="true" layoutX="614.0" layoutY="402.0" onAction="#handleButtonPressed" ripplerFill="#405aa8" stylesheets="@../css/login.css" text="Login" />
+            <JFXButton id="registerButton" fx:id="registerButton" buttonType="RAISED" layoutX="1103.0" layoutY="100.0" onAction="#handleButtonPressed" ripplerFill="#000359" stylesheets="@../css/login.css" text="Register" textFill="WHITE" />
             <Label fx:id="errorLabel" layoutX="519.0" layoutY="178.0" textFill="#c61e1e">
                <font>
                   <Font name="System Bold" size="13.0" />
+               </font>
+            </Label>
+            <Label layoutX="573.0" layoutY="102.0" text="Login Form">
+               <font>
+                  <Font name="Apple Braille Outline 6 Dot" size="26.0" />
                </font>
             </Label>
          </children>
