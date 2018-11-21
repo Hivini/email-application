@@ -1,6 +1,7 @@
 package application.classifier;
 
 import application.dataModels.Mail;
+import application.handlers.MailDataHandler;
 import application.handlers.UserData;
 import de.daslaboratorium.machinelearning.classifier.Classifier;
 import de.daslaboratorium.machinelearning.classifier.bayes.BayesClassifier;

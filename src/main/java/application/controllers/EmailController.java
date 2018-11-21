@@ -151,8 +151,8 @@ public class EmailController {
         } else if (e.getSource().equals(spamButton)) {
             if (!mails.isEmpty()) {
                 mails.setPredicate(Mail::isSpam);
-                inSpamInbox = true;
             }
+            inSpamInbox = true;
             spamButton.getStyleClass().removeAll("normalButton");
             spamButton.getStyleClass().add("selectedButton");
             inboxButton.getStyleClass().removeAll("selectedButton");
@@ -230,6 +230,7 @@ public class EmailController {
 
     private void handleRefresh() {
         MailDataHandler.getInstance().refreshMails();
+        emailList.refresh();
     }
 
     private void processUserEmails() {

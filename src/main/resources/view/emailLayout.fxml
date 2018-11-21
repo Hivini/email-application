@@ -18,7 +18,7 @@
          <children>
             <MenuBar>
               <menus>
-                <Menu mnemonicParsing="false" text="File">
+                <Menu mnemonicParsing="false" text="Account">
                   <items>
                     <MenuItem mnemonicParsing="false" onAction="#signOut" text="Sign Out" />
                   </items>
